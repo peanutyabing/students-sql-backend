@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const EXPRESS_PORT = 3004;
 
 require("dotenv").config();
 const pgConnectionsConfigs = {
@@ -18,10 +19,11 @@ const studentController = new StudentController(pool);
 const studentRouter = new StudentRouter(express, studentController);
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", studentRouter.routes());
 
-app.listen(3004, () => {
-  console.log("Listening to port 3004");
+app.listen(EXPRESS_PORT, () => {
+  console.log(`Listening to port ${EXPRESS_PORT}`);
 });

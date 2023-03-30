@@ -7,7 +7,8 @@ class StudentRouter {
   routes = () => {
     let router = this.express.Router();
     router.get("/", this.controller.getStudents);
-    router.post("/", this.controller.insertStudents);
+    router.post("/", this.controller.insertStudent);
+    router.put("/:column/:value", this.controller.updateStudent);
     return router;
   };
 }

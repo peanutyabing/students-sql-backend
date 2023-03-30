@@ -64,6 +64,25 @@ class StudentController {
       res.status(503).send(`error while updating data: ${err.message}`);
     }
   };
+
+  removeStudent = async (req, res) => {
+    try {
+      console.log("request params", req.params);
+      let [col, val] = [req.params.column, req.params.value];
+      if (col === "first_name" || col === "last_name") {
+        val = `'${val}'`;
+      }
+      const deletedData = await this.client.query(
+        `DELETE FROM students WHERE ${col} = ${val};`
+      );
+      console.log(`deleted ${deletedData.rowCount} row(s)`);
+      const table = await this.client.query("SELECT * FROM students;");
+      res.json(table.rows);
+    } catch (err) {
+      console.log("error while deleting data: ", err.stack);
+      res.status(503).send(`error while deleting data: ${err.message}`);
+    }
+  };
 }
 
 module.exports = StudentController;

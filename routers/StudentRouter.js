@@ -9,6 +9,7 @@ class StudentRouter {
     router.get("/", this.controller.getStudents);
     router.post("/", this.controller.insertStudent);
     router.put("/:column/:value", this.controller.updateStudent);
+    router.delete("/:column/:value", this.controller.removeStudent);
     return router;
   };
 }

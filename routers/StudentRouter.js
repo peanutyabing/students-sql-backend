@@ -8,8 +8,8 @@ class StudentRouter {
     let router = this.express.Router();
     router.get("/", this.controller.getStudents);
     router.post("/", this.controller.insertStudent);
-    router.put("/:column/:value", this.controller.updateStudent);
-    router.delete("/:column/:value", this.controller.removeStudent);
+    router.put("/:id/:value", this.controller.updateStudent);
+    router.delete("/:id/:value", this.controller.removeStudent);
     return router;
   };
 }

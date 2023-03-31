@@ -5,7 +5,9 @@ class StudentController {
 
   getStudents = async (req, res) => {
     try {
-      const table = await this.client.query("SELECT * FROM students;");
+      const table = await this.client.query(
+        "SELECT * FROM students ORDER BY id;"
+      );
       console.log(table.rows);
       res.json(table.rows);
     } catch (err) {
@@ -26,7 +28,9 @@ class StudentController {
         `INSERT INTO students (first_name, last_name, mobile, gender) VALUES ('${first_name}', '${last_name}', ${mobile}, ${gender});`
       );
       console.log(`inserted ${newData.rowCount} row(s)`);
-      const table = await this.client.query("SELECT * FROM students;");
+      const table = await this.client.query(
+        "SELECT * FROM STUDENTS ORDER BY id;"
+      );
       res.json(table.rows);
     } catch (err) {
       console.log("error while inserting data to table: ", err.stack);
@@ -37,13 +41,9 @@ class StudentController {
   };
 
   updateStudent = async (req, res) => {
+    console.log("request params", req.params);
+    const idToUpdate = req.params.value;
     try {
-      console.log("request params", req.params);
-      let [col, val] = [req.params.column, req.params.value];
-      if (col === "first_name" || col === "last_name") {
-        val = `'${val}'`;
-      }
-
       let updates = "";
       for (const key in req.body) {
         if (key === "first_name" || key === "last_name") {
@@ -54,10 +54,12 @@ class StudentController {
       }
       updates = updates.slice(0, -2);
       const updatedData = await this.client.query(
-        `UPDATE students SET ${updates} WHERE ${col} = ${val};`
+        `UPDATE students SET ${updates} WHERE id = ${idToUpdate};`
       );
       console.log(`updated ${updatedData.rowCount} row(s)`);
-      const table = await this.client.query("SELECT * FROM students;");
+      const table = await this.client.query(
+        "SELECT * FROM STUDENTS ORDER BY id;"
+      );
       res.json(table.rows);
     } catch (err) {
       console.log("error while updating data: ", err.stack);
@@ -66,14 +68,11 @@ class StudentController {
   };
 
   removeStudent = async (req, res) => {
+    const idToRemove = req.params.value;
+    console.log("request params", idToRemove);
     try {
-      console.log("request params", req.params);
-      let [col, val] = [req.params.column, req.params.value];
-      if (col === "first_name" || col === "last_name") {
-        val = `'${val}'`;
-      }
       const deletedData = await this.client.query(
-        `DELETE FROM students WHERE ${col} = ${val};`
+        `DELETE FROM students WHERE id = ${idToRemove};`
       );
       console.log(`deleted ${deletedData.rowCount} row(s)`);
       const table = await this.client.query("SELECT * FROM students;");
@@ -81,6 +80,13 @@ class StudentController {
     } catch (err) {
       console.log("error while deleting data: ", err.stack);
       res.status(503).send(`error while deleting data: ${err.message}`);
+    }
+    try {
+      const deletedAddress = await this.client.query(
+        `DELETE FROM student_addresses WHERE student_id = ${idToRemove};`
+      );
+    } catch (err) {
+      console.log("error while deleting student address: ", err.stack);
     }
   };
 }

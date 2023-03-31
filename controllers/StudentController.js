@@ -4,15 +4,40 @@ class StudentController {
   }
 
   getStudents = async (req, res) => {
-    try {
-      const table = await this.client.query(
-        "SELECT * FROM students ORDER BY id;"
-      );
-      console.log(table.rows);
-      res.json(table.rows);
-    } catch (err) {
-      console.log("error while getting table: ", err.stack);
-      res.status(503).send(`error while getting table: ${err.message}`);
+    const queryParams = req.query;
+    console.log(queryParams);
+    if (Object.keys(queryParams).length) {
+      let queryStr = "WHERE ";
+      for (const key in queryParams) {
+        if (key === "first_name" || key === "last_name") {
+          queryStr += `${key} = '${queryParams[key]}' AND `;
+        } else {
+          queryStr += `${key} = ${queryParams[key]} AND `;
+        }
+      }
+      queryStr = queryStr.slice(0, -4);
+      console.log(`SELECT * FROM students ${queryStr} ORDER BY id;`);
+      try {
+        const table = await this.client.query(
+          `SELECT * FROM students ${queryStr} ORDER BY id;`
+        );
+        console.log(table.rows);
+        res.json(table.rows);
+      } catch (err) {
+        console.log("error while getting table: ", err.stack);
+        res.status(503).send(`error while getting table: ${err.message}`);
+      }
+    } else {
+      try {
+        const table = await this.client.query(
+          "SELECT * FROM students ORDER BY id;"
+        );
+        console.log(table.rows);
+        res.json(table.rows);
+      } catch (err) {
+        console.log("error while getting table: ", err.stack);
+        res.status(503).send(`error while getting table: ${err.message}`);
+      }
     }
   };
 
